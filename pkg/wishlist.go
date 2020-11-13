@@ -10,7 +10,7 @@ import (
 )
 
 type Game struct {
-	Name string `json:name`
+	Name string `json:"name"`
 }
 
 func ScrapeWishlist(steamId string) []string{

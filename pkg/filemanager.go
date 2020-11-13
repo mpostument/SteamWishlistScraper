@@ -16,7 +16,10 @@ func SaveToFile(gameData []string) {
 	dataWriter := bufio.NewWriter(file)
 
 	for _, data := range gameData {
-		dataWriter.WriteString(data + "\n")
+		_, err := dataWriter.WriteString(data + "\n")
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
 
 	dataWriter.Flush()
