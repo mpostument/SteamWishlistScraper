@@ -71,6 +71,7 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.SteamWishlistScraper.yaml)")
 	rootCmd.PersistentFlags().StringP("username", "u", "", "Steam UserName")
+	rootCmd.MarkPersistentFlagRequired("username")
 }
 
 // initConfig reads in config file and ENV variables if set.
