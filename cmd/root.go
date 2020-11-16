@@ -37,13 +37,10 @@ examples and usage of using your application. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
 var api = &cobra.Command{
-	Use:   "api",
+	Use:   "scrape",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -51,7 +48,9 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		steamID := pkg.GetSteamId("rip777", "0617BDE24E9F73AA0690B7F886064351")
+		key := viper.GetString("SteamApiKey")
+		userName, _ := cmd.Flags().GetString("username")
+		steamID := pkg.GetSteamId(userName, key)
 		games := pkg.ScrapeWishlist(steamID)
 		pkg.SaveToFile(games)
 	},
@@ -69,15 +68,9 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.AddCommand(api)
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.SteamWishlistScraper.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().StringP("username", "u", "", "Steam UserName")
 }
 
 // initConfig reads in config file and ENV variables if set.

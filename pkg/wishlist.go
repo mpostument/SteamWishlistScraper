@@ -6,7 +6,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"sort"
+	"strconv"
 )
 
 type Game struct {
@@ -18,7 +20,15 @@ func ScrapeWishlist(steamId string) []string{
 	var gameList []string
 
 	for {
-		page, err := http.Get(fmt.Sprintf("https://store.steampowered.com/wishlist/profiles/%s/wishlistdata/?p=%d", steamId, pageNumber))
+		baseUrl := fmt.Sprintf("https://store.steampowered.com/wishlist/profiles/%s/wishlistdata/", steamId)
+		u, err := url.Parse(baseUrl)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		queryString := u.Query()
+		queryString.Set("p", strconv.Itoa(pageNumber))
+		u.RawQuery = queryString.Encode()
+		page, err := http.Get(u.String())
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -28,7 +38,6 @@ func ScrapeWishlist(steamId string) []string{
 		err = json.NewDecoder(page.Body).Decode(&result)
 		if err != nil {
 			res, _ := ioutil.ReadAll(page.Body)
-			fmt.Println(res)
 			if len(res) <= 2 {
 				break
 			}
