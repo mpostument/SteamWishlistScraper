@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "steamwishlistscraper/cmd"
+import "github.com/mpostument/SteamWishlistScraper/cmd"
 
 func main() {
 	cmd.Execute()

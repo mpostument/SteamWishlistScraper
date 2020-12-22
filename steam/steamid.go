@@ -1,4 +1,4 @@
-package pkg
+package steam
 
 import (
 	"encoding/json"
@@ -17,10 +17,10 @@ type Response struct {
 }
 
 func GetSteamId(userName string, apiKey string) string {
-	baseUrl := "http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/"
-	u, err := url.Parse(baseUrl)
+	baseURL := "http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/"
+	u, err := url.Parse(baseURL)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Not able to parse url", err)
 	}
 	queryString := u.Query()
 	queryString.Set("key", apiKey)
@@ -29,15 +29,14 @@ func GetSteamId(userName string, apiKey string) string {
 
 	resp, err := http.Get(u.String())
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Didn't get response from steam", err)
 	}
-
 	defer resp.Body.Close()
 	var result User
 
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Decoding failed", err)
 	}
 	return result.Response.Steamid
 }

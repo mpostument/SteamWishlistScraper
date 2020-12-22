@@ -17,8 +17,10 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
-	"steamwishlistscraper/pkg"
+
+	"github.com/mpostument/SteamWishlistScraper/steam"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -30,29 +32,20 @@ var cfgFile string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "steamwishlistscraper",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Root comand for steam interaction",
+	Long:  `Root comand for steam interaction.`,
 }
 
 var api = &cobra.Command{
 	Use:   "scrape",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Scrape steam wishlist",
+	Long:  `Scrape steam wishlist.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		key := viper.GetString("SteamApiKey")
+		apiKey := viper.GetString("apikey")
 		userName, _ := cmd.Flags().GetString("username")
-		steamID := pkg.GetSteamId(userName, key)
-		games := pkg.ScrapeWishlist(steamID)
-		pkg.SaveToFile(games)
+		steamID := steam.GetSteamId(userName, apiKey)
+		games := steam.ScrapeWishlist(steamID)
+		steam.SaveToFile(games)
 	},
 }
 
@@ -71,7 +64,13 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.SteamWishlistScraper.yaml)")
 	rootCmd.PersistentFlags().StringP("username", "u", "", "Steam UserName")
-	rootCmd.MarkPersistentFlagRequired("username")
+	if err := rootCmd.MarkPersistentFlagRequired("username"); err != nil {
+		log.Println(err)
+	}
+	rootCmd.PersistentFlags().StringP("apikey", "a", "", "Steam api key")
+	if err := viper.BindPFlag("apikey", rootCmd.PersistentFlags().Lookup("apikey")); err != nil {
+		log.Println(err)
+	}
 }
 
 // initConfig reads in config file and ENV variables if set.

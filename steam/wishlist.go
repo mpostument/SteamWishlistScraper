@@ -1,4 +1,4 @@
-package pkg
+package steam
 
 import (
 	"encoding/json"
@@ -15,22 +15,22 @@ type Game struct {
 	Name string `json:"name"`
 }
 
-func ScrapeWishlist(steamId string) []string{
+func ScrapeWishlist(steamId string) []string {
 	pageNumber := 0
 	var gameList []string
 
 	for {
-		baseUrl := fmt.Sprintf("https://store.steampowered.com/wishlist/profiles/%s/wishlistdata/", steamId)
-		u, err := url.Parse(baseUrl)
+		baseURL := fmt.Sprintf("https://store.steampowered.com/wishlist/profiles/%s/wishlistdata/", steamId)
+		u, err := url.Parse(baseURL)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatalln("Not able to pars url", err)
 		}
 		queryString := u.Query()
 		queryString.Set("p", strconv.Itoa(pageNumber))
 		u.RawQuery = queryString.Encode()
 		page, err := http.Get(u.String())
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatalln("Didn't get responce from wishlist page", err)
 		}
 
 		var result map[string]Game
@@ -41,7 +41,7 @@ func ScrapeWishlist(steamId string) []string{
 			if len(res) <= 2 {
 				break
 			}
-			log.Fatalln(err)
+			log.Fatalln("Wishlist decoding failed", err)
 		}
 		page.Body.Close()
 		for _, v := range result {
