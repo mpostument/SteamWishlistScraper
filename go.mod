@@ -1,4 +1,4 @@
-module steamwishlistscraper
+module github.com/mpostument/SteamWishlistScraper
 
 go 1.15
 
